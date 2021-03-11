@@ -16,7 +16,7 @@ from tensorflow.keras import layers
 
 NUM_ACTIONS = 6
 MOVE_INTERVAL = 0.1
-ROTATE_INTERVAL = 1
+ROTATE_INTERVAL = 90
 MAX_LENGTH = 10
 BATCH_SIZE = 10
 EPISODE = 10
@@ -59,14 +59,14 @@ def action_down(_cords):
 def action_left(_cords):
     temps = copy.deepcopy(_cords)
     for _xy in temps:
-        _xy.x_cords = float(_xy.x_cords) - MOVE_INTERVAL
+        _xy.x_cord = float(_xy.x_cord) - MOVE_INTERVAL
     return temps
 
 
 def action_right(_cords):
     temps = copy.deepcopy(_cords)
     for _xy in temps:
-        _xy.x_cords = float(_xy.x_cords) + MOVE_INTERVAL
+        _xy.x_cord = float(_xy.x_cord) + MOVE_INTERVAL
     return temps
 
 #https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
@@ -76,9 +76,16 @@ def action_rotate_xy(_cords):
 
     temps = copy.deepcopy(_cords)
     for _xy in temps:
-        _xy.x_cords = _xy.x_cords * c + _xy.y_cords * s
-        _xy.y_cords = - 1 * _xy.x_cords * s + _xy.y_cords * c
+        _xy.x_cord = _xy.x_cord * c + _xy.y_cord * s
+        _xy.y_cord = - 1 * _xy.x_cord * s + _xy.y_cord * c
     return temps
+
+
+def reward_calculator (_false_dist, _real_dist,_dim):
+    real_distance_map =np.sum((_false_dist-_real_dist)**2)/(_dim)
+
+
+    return  real_distance_map**0.5
 
 
 def action_yx(_cords):
@@ -87,13 +94,13 @@ def action_yx(_cords):
 
     temps = copy.deepcopy(_cords)
     for _xy in temps:
-        _xy.x_cords = _xy.x_cords * c - _xy.y_cords * s
-        _xy.y_cords = _xy.x_cords * s + _xy.y_cords * c
+        _xy.x_cord = _xy.x_cord * c - _xy.y_cord * s
+        _xy.y_cord = _xy.x_cord * s + _xy.y_cord * c
     return temps
 
 
 def distance_calculation(_cord_1, _cord_2):
-    return (((_cord_1.x - _cord_2.x) ** 2) + ((_cord_2.y - _cord_2.y) ** 2)) ** 0.5
+    return (((_cord_1.x_cord - _cord_2.x_cord) ** 2) + ((_cord_2.y_cord - _cord_2.y_cord) ** 2)) ** 0.5
 
 
 # STATE
@@ -101,7 +108,7 @@ def get_state(_cord_1, _cord_2):
     len_1 = len(_cord_1)
     len_2 = len(_cord_2)
     # first in column
-    cords = np.zero((MAX_LENGTH, MAX_LENGTH))
+    cords = np.zeros((MAX_LENGTH, MAX_LENGTH))
     for value_1 in range(0, len_1):
         # second in row
         for value_2 in range(0, len_2):
@@ -155,15 +162,15 @@ def read_cord_files(_files):
         if len(line) > 1:
             x, y = line.split(",")
             temp = cord_2d()
-            temp.x = float(x)
-            temp.y = float(y)
+            temp.x_cord = float(x)
+            temp.y_cord = float(y)
             cords.append(temp)
     return cords
 
 
 def render_3(i):
-    cord_x_1, cord_y_1 = read_cord_files_xy("cord_1.txt")
-    cord_x_2, cord_y_2 = read_cord_files_xy("cord_2.txt")
+    cord_x_1, cord_y_1 = read_cord_files_xy("cord_1_real.txt")
+    cord_x_2, cord_y_2 = read_cord_files_xy("cord_2_real.txt")
     plt.cla()
 
     plt.plot(cord_x_1, cord_y_1, marker='o', color='g', linewidth=2)
@@ -188,5 +195,16 @@ l = 10
 # plt.show()
 episodes = 100
 # AGENT
+
+real_agent_1 = read_cord_files("cord_1_real.txt")
+real_agent_2 = read_cord_files("cord_2_real.txt")
+
 agent_1 = read_cord_files("cord_1.txt")
 agent_2 = read_cord_files("cord_2.txt")
+_dim_1= len(agent_1)
+_dim_2= len(agent_2)
+dim = _dim_1 *_dim_2
+real_distance_map = get_state(real_agent_1,real_agent_2)
+agent_distance_map = get_state(agent_1,agent_2)
+r= reward_calculator(real_distance_map,agent_distance_map,dim)
+print(r)

@@ -5,6 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/2d_games.py" beforeDir="false" afterPath="$PROJECT_DIR$/2d_games.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cord_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cord_2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_2.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +31,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.dist_map_from_backbones">
+  <component name="RunManager" selected="Python.2d_games">
     <configuration name="2d_games" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DeepRLP" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -75,8 +76,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.dist_map_from_backbones" />
         <item itemvalue="Python.2d_games" />
+        <item itemvalue="Python.dist_map_from_backbones" />
       </list>
     </recent_temporary>
   </component>
@@ -95,14 +96,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/2d_games.py</url>
-          <line>169</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/utils/dist_map_from_backbones.py</url>
           <line>20</line>
           <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2d_games.py</url>
+          <line>87</line>
+          <option name="timeStamp" value="33" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

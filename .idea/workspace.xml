@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8cc11941-f425-4a16-90d3-bf42c7b632d6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/DeepRLP.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DeepRLP.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/2d_games.py" beforeDir="false" afterPath="$PROJECT_DIR$/2d_games.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/new_ag_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/new_ag_1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/new_ag_2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/new_ag_2.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,13 +102,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/2d_games.py</url>
-          <line>317</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/2d_games.py</url>
-          <line>294</line>
-          <option name="timeStamp" value="46" />
+          <line>346</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

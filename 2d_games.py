@@ -1,10 +1,18 @@
 # https://github.com/keras-team/keras-io/blob/master/examples/rl/deep_q_network_breakout.py
+
+import sys
+
+import os
+import sys
+import glob
+import numpy as np
+from math import sin, cos
+import math
+import random
 import copy
 import random
 from math import cos, sin
-
 import keras
-import numpy as np
 import time
 
 # EXPLOITATION VS EXPLORATATION
@@ -24,20 +32,20 @@ from keras.layers import Dense, Conv2D, Flatten, Dropout, Input
 from keras.optimizers import Adam
 import tensorflow as tf
 
-optimizer = keras.optimizers.Adam(learning_rate=0.00025, clipnorm=1.0)
-eps_decay = 0.01
+optimizer = keras.optimizers.Adam(learning_rate=0.0025)
+eps_decay = 0.1
 NUM_ACTIONS = 6
-MOVE_INTERVAL = 0.1
-ROTATE_INTERVAL = 90
+MOVE_INTERVAL = 0.5
+ROTATE_INTERVAL = math.radians(10)
 MAX_LENGTH = 10
-BATCH_SIZE = 100
-EPISODE = 10
-MEMORY_SIZE = 100
+BATCH_SIZE = 32
+UPDATE_INTERVAL = 100
+MEMORY_SIZE = 1000
 gamma = 0.99  # Discount factor for past rewards
 epsilon = 1.0  # Epsilon greedy parameter
-epsilon_min = 0.1  # Minimum epsilon greedy parameter
+epsilon_min = 0.3 # Minimum epsilon greedy parameter
 epsilon_max = 1.0
-max_steps_per_episode = 1000
+max_steps_per_episode =200
 
 loss_function = keras.losses.Huber()
 
@@ -47,12 +55,17 @@ def create_q_model():
     inputs = Input(shape=(MAX_LENGTH, MAX_LENGTH, 1))
     model.add(inputs)
     model.add(
-        Conv2D(filters=10,
+        Conv2D(filters=32,
                kernel_size=(1, 1),
                activation="relu",
                kernel_initializer='he_uniform'))
     model.add(Dropout(0.1))
-
+    model.add(
+        Conv2D(filters=64,
+               kernel_size=(1, 1),
+               activation="relu",
+               kernel_initializer='he_uniform'))
+    model.add(Dropout(0.1))
     model.add(Flatten())
     model.add(Dense(NUM_ACTIONS, activation="softmax"))
     return model
@@ -104,15 +117,6 @@ def get_rmsd(_false_dist, _real_dist, _dim):
     return float(real_distance_map ** 0.5)
 
 
-# new_Q - old_Q
-def get_rewards(_false_dist, _real_dist, _dim):
-    tots = 1 / (1 + get_rmsd(_false_dist, _real_dist, _dim))
-    if tots > 0.75:
-        return 100
-    else:
-        return tots
-
-
 def action_rotate_yx(_cords):
     s = sin(ROTATE_INTERVAL)  # angle is in radians
     c = cos(ROTATE_INTERVAL)  # angle is in radians
@@ -122,6 +126,15 @@ def action_rotate_yx(_cords):
         _xy.x_cord = _xy.x_cord * c - _xy.y_cord * s
         _xy.y_cord = _xy.x_cord * s + _xy.y_cord * c
     return temps
+# new_Q - old_Q
+def get_rewards(_false_dist, _real_dist, _dim):
+    tots = 1 / (1 + get_rmsd(_false_dist, _real_dist, _dim))
+    if tots > 0.75:
+        return 100
+    else:
+        return tots
+
+
 
 
 def distance_calculation(_cord_1, _cord_2):
@@ -189,35 +202,50 @@ def render_3(i):
     plt.plot(cord_x_1, cord_y_1, marker='o', color='g', linewidth=2)
     plt.plot(cord_x_2, cord_y_2, marker='x', color='b', linewidth=2)
 
-
+    plt.savefig('/home/rajroy/rl_logs/img/'+str(time.time()) + "_.png")
 
 
 
 def get_new_cords(agent_1, _action_number):
     temp_agent = copy.deepcopy(agent_1)
+    print_val=0
     if _action_number == 0:
         temp_agent = action_up(agent_1)
+        if print_val ==1:
+            print("action_up")
     elif _action_number == 1:
         temp_agent = action_down(agent_1)
+        if print_val == 1:
+            print("action_down")
     elif _action_number == 2:
         temp_agent = action_left(agent_1)
+        if print_val == 1:
+            print("action_left")
     elif _action_number == 3:
         temp_agent = action_right(agent_1)
+        if print_val == 1:
+            print("action_right")
     elif _action_number == 4:
         temp_agent = action_rotate_xy(agent_1)
+        if print_val == 1:
+            print("action_rotate_xy")
     elif _action_number == 5:
         temp_agent = action_rotate_yx(agent_1)
+        if print_val == 1:
+            print("action_rotate_yx")
     return temp_agent
 
 
 def take_action(_state, _action_number, _agent_1, _agent_2, _concerned_size,_qa):
     new_cords = get_new_cords(_agent_1, _action_number)
     next_state = get_state(new_cords, _agent_2)
-
+    # get_current_visualiztion(_new_ag_1=new_cords, _new_ag_2=_agent_2)
     reward = get_rewards(_false_dist=_state,_real_dist= _qa,_dim= _concerned_size)
     done_flag = False
-    if reward == 0:
+    if reward == 100:
         done_flag = True
+
+    # get_current_visualiztion(_new_ag_1=new_cords, _new_ag_2=_agent_2)
     return next_state, reward, done_flag,new_cords,agent_2
 
 
@@ -225,22 +253,21 @@ def take_action(_state, _action_number, _agent_1, _agent_2, _concerned_size,_qa)
 def write2File(_filename, _cont):
     with open(_filename, "w") as f:
         f.writelines(_cont)
-        if _cont[len(_cont) - 1].strip() != "END":
-            f.write("END")
+        # if _cont[len(_cont) - 1].strip() != "END":
+        #     f.write("END")
     return
 
 def save_cords_2_file(_cords,_file):
     out_string =""
     for val in _cords:
-        out_string+=str(val.x_cord)+","+str(val.y_cord)
+        out_string+=str(val.x_cord)+","+str(val.y_cord)+"\n"
         write2File(_file,out_string)
 
 model = create_q_model()
 model_target = create_q_model()
 l = 10
-ani = animation.FuncAnimation(plt.gcf(), render_3, interval=100)
-plt.show()
-episodes = 100
+
+
 # AGENT
 
 agent_1 = read_cord_files("cord_1.txt")
@@ -263,23 +290,38 @@ state_history = []
 state_next_history = []
 done_history = []
 rewards_history = []
-UPDATE_INTERVAL = 100
+
 
 episode_reward_history = []
 episode_count = 0
+
+
+def get_current_visualiztion(_new_ag_1,_new_ag_2):
+    save_cords_2_file(_cords=_new_ag_1, _file="new_ag_1.txt")
+    save_cords_2_file(_cords=_new_ag_2, _file="new_ag_2.txt")
+
+    ani = animation.FuncAnimation(plt.gcf(), render_3, interval=1000)
+    plt.show()
+
+
 while True:  # Run until solved
 
     # agent_1 = read_cord_files("cord_1.txt")
     # agent_2 = read_cord_files("cord_2.txt")
     # real_distance_map = get_state(real_agent_1, real_agent_2)
-
+    frame_count = 0
+    agent_1 = read_cord_files("cord_1.txt")
+    agent_2 = read_cord_files("cord_2.txt")
     agent_distance_map = get_state(agent_1, agent_2)
     episode_reward = 0
     for timestep in range(1, max_steps_per_episode):
+
+        frame_count += 1
         cur_state = get_state(agent_1, agent_2)
 
         if epsilon > np.random.rand(1)[0]:
             action = np.random.choice(NUM_ACTIONS)
+
         else:
             state_tensor = tf.convert_to_tensor(cur_state)
             state_tensor = tf.expand_dims(state_tensor, 0)
@@ -290,9 +332,9 @@ while True:  # Run until solved
         # Decay probability of taking random action
         epsilon -= eps_decay
         epsilon = max(epsilon, epsilon_min)
-        next_state, rewards, done ,new_ag_1,new_ag_2= take_action(_state=cur_state, _action_number=action, _agent_1=agent_1,
+        next_state, rewards, done ,agent_1,agent_2= take_action(_state=cur_state, _action_number=action, _agent_1=agent_1,
                                                 _agent_2=agent_2, _concerned_size=dim,_qa =real_distance_map)
-        episode_reward +=rewards
+        episode_reward+=rewards
         # replay memory stuffss
         action_history.append(action)
         state_history.append(cur_state)
@@ -340,12 +382,15 @@ while True:  # Run until solved
             grads = tape.gradient(loss, model.trainable_variables)
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
-        if timestep % UPDATE_INTERVAL == 0:
+        if timestep % (UPDATE_INTERVAL) == 0:
+
             # update the the target network with new weights
             model_target.set_weights(model.get_weights())
             # Log details
             template = "running reward: {:.2f} at episode {}, frame count {}"
-            print(template.format(running_reward, episode_count, timestep))
+            # print(template.format(running_reward, episode_count, timestep))
+            print(template.format(np.mean(episode_reward_history), episode_count, timestep))
+            # get_current_visualiztion(_new_ag_1=agent_1, _new_ag_2=agent_2)
 
             # Limit the state and reward history
         if len(rewards_history) > MEMORY_SIZE:
@@ -360,14 +405,13 @@ while True:  # Run until solved
 
             # Update running reward to check condition for solving
         episode_reward_history.append(episode_reward)
-        if len(episode_reward_history) > 100:
+        if len(episode_reward_history) > MEMORY_SIZE:
             del episode_reward_history[:1]
         running_reward = np.mean(episode_reward_history)
 
         episode_count += 1
 
-        if running_reward>700:  # Condition to consider the task solved
+        if rewards>70:  # Condition to consider the task solved
             print("Solved at episode {}!".format(episode_count))
-            save_cords_2_file(_cords=new_ag_1,_file="cur_ag_1.txt")
-            save_cords_2_file(_cords=new_ag_2,_file="cur_ag_2.txt")
+            get_current_visualiztion(_new_ag_1=agent_1,_new_ag_2=agent_2)
             break

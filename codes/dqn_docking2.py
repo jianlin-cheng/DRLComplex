@@ -135,7 +135,7 @@ class env():
         return self.get_distance_map(),reward, done
         
     def reset(self):
-        self.pose = self.original_pose
+        self.pose = self.original_pose.clone()
         return self.get_distance_map()       
     
  
@@ -267,6 +267,7 @@ def play_and_record(agent, env, exp_replay, initial_state, n_steps=1):
 
     s = initial_state
     total_reward = 0.0
+    env.pose.dump_pdb('/home/esdft/rotated_1D3Y4.pdb')
     
     for t in range(n_steps):
         qs = agent.get_qvalues([s])
@@ -287,7 +288,7 @@ def play_and_record(agent, env, exp_replay, initial_state, n_steps=1):
     return total_reward
  
  
-
+#initial_state=env.reset()
 play_and_record(agent, env, replay, initial_state=env.reset(), n_steps=10000)
 
 print(replay.sample(32))

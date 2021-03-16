@@ -69,9 +69,9 @@ class env():
           for j in range(start_B, end_B+1):
             distance_map[i-1, j-1-end_A] = self.find_dist(i, j)
 
-
-        return distance_map[:, :, tf.newaxis]
-        
+        distance_map = distance_map[:, :, tf.newaxis]
+        distance_map = distance_map / distance_map.max()
+        return distance_map
         
     def get_rotation_matrix(self,axis_name, degree_magnitude):
         degree_magnitude = math.radians(degree_magnitude)
@@ -126,17 +126,21 @@ class env():
         
         if curr_ca_rmsd <= 1:
           done = True
-          reward  = 100
+          reward  = 1
         else:
           done = False
-          reward = self.prev_ca_rmsd - curr_ca_rmsd
+          diff = self.prev_ca_rmsd - curr_ca_rmsd
+          reward = 0 if diff < 0 else 1 / (1 + curr_ca_rmsd)
           self.prev_ca_rmsd = curr_ca_rmsd
           
         return self.get_distance_map(),reward, done
         
     def reset(self):
         self.pose = self.original_pose.clone()
-        return self.get_distance_map()       
+        return self.get_distance_map()    
+
+    def get_current_state(self):
+        return self.get_distance_map()    
     
  
 
@@ -241,26 +245,28 @@ sess.run(tf.global_variables_initializer())
 replay = ReplayMemory()
 
 
-def evaluate(env, agent, n_targets=1, greedy=False, t_max=10000):
+def evaluate(env, agent, n_games=1, greedy=False, t_max=10000):
     
     rewards = []
-    for _ in range(n_targets):
+    for _ in range(n_games):
         s = env.reset()
         reward = 0
         for _ in range(t_max):
             qvalues = agent.get_qvalues([s])
             action = qvalues.argmax(axis=-1)[0] if greedy else agent.sample_actions(qvalues)[0]
             s, r, done = env.step(action)
-            print(action, r, done)
+            #print(action, r, done)
             reward += r
             if done: break
                 
         rewards.append(reward)
-    return np.mean(rewards)
+    mean_reward = np.mean(rewards)
+    print(mean_reward)
+    return mean_reward
 
  
  
-evaluate(env, agent, n_targets=1)
+#evaluate(env, agent, n_targets=1)
  
  
 def play_and_record(agent, env, exp_replay, initial_state, n_steps=1):
@@ -289,34 +295,111 @@ def play_and_record(agent, env, exp_replay, initial_state, n_steps=1):
  
  
 #initial_state=env.reset()
-play_and_record(agent, env, replay, initial_state=env.reset(), n_steps=10000)
+#play_and_record(agent, env, replay, initial_state=env.reset(), n_steps=100)
 
-print(replay.sample(32))
+#print(replay.sample(32))
  
  
  
  
  
  
+ 
+ 
+target_network = DQNAgent("target_network", state_dim, n_actions)
+
+def load_weigths_into_target_network(agent, target_network):
+
+    assigns = []
+    for w_agent, w_target in zip(agent.weights, target_network.weights):
+        assigns.append(tf.assign(w_target, w_agent, validate_shape=True))
+    tf.get_default_session().run(assigns)
     
-'''env = env('/storage/hpc/data/esdft/50_true/1D3Y.pdb', '/storage/hpc/data/esdft/initial_starts/1D3Y_modified.pdb')
-replay = ReplayMemory()
-dm1,r1, d1 = env.commit_action(1)
-env.pose.dump_pdb('/storage/hpc/data/esdft/rotated_1D3Y.pdb')
-print(dm1)
-print(r1, d1)
-replay.store_distance_map(dm1)
-replay.store_transition(0, r1, d1)
-dm2,r2, d2 = env.commit_action(1)
-print(r2, d2)
-print(dm2)
-replay.store_distance_map(dm2)
-replay.store_transition(0, r2, d2)
+    
+    
+    
 
-print(replay.num_data)
-print(replay.rewards)
-print(replay.done)
-print('mahdi')
-print(replay.sample(1))
-#env.pose.dump_pdb('/storage/hpc/data/esdft/rotated_1D3Y.pdb')'''
+obs_ph = tf.placeholder(tf.float32, shape=(None,) + state_dim)
+actions_ph = tf.placeholder(tf.int32, shape=[None])
+rewards_ph = tf.placeholder(tf.float32, shape=[None])
+next_obs_ph = tf.placeholder(tf.float32, shape=(None,) + state_dim)
+is_done_ph = tf.placeholder(tf.float32, shape=[None])
 
+is_not_done = 1 - is_done_ph
+gamma = 0.99
+
+
+current_qvalues = agent.get_symbolic_qvalues(obs_ph)
+current_action_qvalues = tf.reduce_sum(tf.one_hot(actions_ph, n_actions) * current_qvalues, axis=1)
+
+
+next_qvalues_target = target_network.get_symbolic_qvalues(next_obs_ph)
+next_state_values_target = is_not_done * tf.reduce_max(next_qvalues_target, axis=1)
+reference_qvalues = rewards_ph + gamma * next_state_values_target
+td_loss = (current_action_qvalues - reference_qvalues) ** 2
+td_loss = tf.reduce_mean(td_loss)
+train_step = tf.train.AdamOptimizer(1e-3).minimize(td_loss, var_list=agent.weights)
+
+
+
+sess.run(tf.global_variables_initializer())
+
+
+
+from tqdm import trange
+from IPython.display import clear_output
+import matplotlib.pyplot as plt
+from pandas import DataFrame
+moving_average = lambda x, span, **kw: DataFrame({'x':np.asarray(x)}).x.ewm(span=span, **kw).mean().values
+
+mean_rw_history = []
+td_loss_history = []
+
+
+exp_replay = ReplayMemory(10**5)
+play_and_record(agent, env, exp_replay,env.get_current_state(), n_steps=10000)
+
+def sample_batch(exp_replay, batch_size):
+    obs_batch, act_batch, reward_batch, next_obs_batch, is_done_batch = exp_replay.sample(batch_size)
+    return {
+        obs_ph:obs_batch, actions_ph:act_batch, rewards_ph:reward_batch, 
+        next_obs_ph:next_obs_batch, is_done_ph:is_done_batch
+    }
+    
+    
+    
+
+
+
+
+for i in trange(10**5):
+    
+    # play
+    play_and_record(agent, env, exp_replay, env.get_current_state(), 10)
+    
+    # train
+    _, loss_t = sess.run([train_step, td_loss], sample_batch(exp_replay, batch_size=64))
+    td_loss_history.append(loss_t)
+    
+    # adjust agent parameters
+    if i % 500 == 0:
+        load_weigths_into_target_network(agent, target_network)
+        agent.epsilon = max(agent.epsilon * 0.99, 0.01)
+        mean_rw_history.append(evaluate(env, agent, n_games=3))
+    
+    if i % 100 == 0:
+        clear_output(True)
+        print("buffer size = %i, epsilon = %.5f" % (exp_replay.memory_size, agent.epsilon))
+        
+        plt.subplot(1,2,1)
+        plt.title("mean reward per game")
+        plt.plot(mean_rw_history)
+        plt.grid()
+
+        assert not np.isnan(loss_t)
+        plt.figure(figsize=[12, 4])
+        plt.subplot(1,2,2)
+        plt.title("TD loss history (moving average)")
+        plt.plot(moving_average(np.array(td_loss_history), span=100, min_periods=100))
+        plt.grid()
+        plt.show()

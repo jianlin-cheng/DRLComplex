@@ -2,8 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8cc11941-f425-4a16-90d3-bf42c7b632d6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/cord_1.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/cord_1_real.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/cord_2.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/cord_2_real.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/new_ag_1.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/sample/box/new_ag_2.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/2d_games.py" beforeDir="false" afterPath="$PROJECT_DIR$/2d_games.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cord_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cord_1_real.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_1_real.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cord_2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_2.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cord_2_real.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cord_2_real.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/new_ag_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/new_ag_1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/new_ag_2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/new_ag_2.txt" afterDir="false" />
     </list>
@@ -23,11 +33,12 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/utils/sample/box" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/utils/sample/box" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -74,9 +85,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="testing_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DeepRLP" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/testing_script.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.2d_games" />
+        <item itemvalue="Python.testing_script" />
         <item itemvalue="Python.dist_map_from_backbones" />
       </list>
     </recent_temporary>
@@ -101,11 +134,52 @@
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/testing_script.py</url>
+          <line>295</line>
+          <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/2d_games.py</url>
-          <line>346</line>
-          <option name="timeStamp" value="69" />
+          <line>503</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2d_games.py</url>
+          <line>323</line>
+          <option name="timeStamp" value="129" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/testing_script.py</url>
+          <line>160</line>
+          <option name="timeStamp" value="134" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/testing_script.py</url>
+          <line>181</line>
+          <option name="timeStamp" value="135" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2d_games.py</url>
+          <line>165</line>
+          <option name="timeStamp" value="142" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2d_games.py</url>
+          <line>183</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2d_games.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="146" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="_action_number" language="Python" />
+        <watch expression="reward" language="Python" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

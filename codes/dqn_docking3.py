@@ -150,7 +150,7 @@ class env():
         
         if curr_ca_rmsd <= 0.4:
           done = True
-          reward  = 100
+          reward  = 1000
         elif curr_ca_rmsd >= 40:
           done = True
           reward = -40

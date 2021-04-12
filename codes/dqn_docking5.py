@@ -150,7 +150,7 @@ class env():
         
         if curr_ca_rmsd <= 0.4:
           done = True
-          reward  = 100
+          reward  = 1
         elif curr_ca_rmsd >= 40:
           done = True
           reward = -40
@@ -159,8 +159,6 @@ class env():
           diff = self.prev_ca_rmsd - curr_ca_rmsd
           if diff < 0:
              reward = diff
-          elif diff > 0 and curr_ca_rmsd <= 6:
-             reward = 1 / (1 + curr_ca_rmsd)
           else:
              reward = 0
           

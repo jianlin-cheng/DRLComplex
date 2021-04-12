@@ -10,6 +10,9 @@ import pyrosetta.rosetta.protocols.rigid as rigid_moves
 import pyrosetta.rosetta.protocols.rigid as rigid_moves
 from pyrosetta import PyMOLMover
 
+
+from docking_gd_parallel import *
+
 init()
 pmm = PyMOLMover()
 pmm.keep_history(True)
@@ -34,9 +37,22 @@ L = tf.keras.layers
 
 class env():
 
-    def __init__(self, true_pdb_file, pdb_file):
+    def __init__(self, true_pdb_file, pdb_file, res_file, weight_file):
         self.true_pose = pyrosetta.pose_from_pdb(true_pdb_file)
         self.pose = pyrosetta.pose_from_pdb(pdb_file)
+
+        self.atom_restraints = add_cons_to_pose(self.pose, res_file)
+        self.scorefxn = ScoreFunction()
+        #self.scorefxn.add_weights_from_file(weight_file)
+        self.scorefxn.set_weight(atom_pair_constraint, 1)
+
+
+        self.atom_restraints.apply(self.pose)
+        self.prev_energy = math.log10(self.scorefxn(self.pose))
+        self.pose.remove_constraints()
+
+
+
         self.original_pose = Pose()
         self.original_pose.assign(self.pose)
         self.prev_pose = Pose()
@@ -146,11 +162,19 @@ class env():
           self.translatePose([0, 0, -1])
           
         curr_ca_rmsd = CA_rmsd(self.true_pose, self.pose)
+
+        self.atom_restraints.apply(self.pose)
+        self.curr_energy = math.log10(self.scorefxn(self.pose))
+        self.pose.remove_constraints()
+
+        
+
+
         pmm.apply(self.pose)
         
         if curr_ca_rmsd <= 0.4:
           done = True
-          reward  = 100
+          reward  = 1
         elif curr_ca_rmsd >= 40:
           done = True
           reward = -40
@@ -159,13 +183,13 @@ class env():
           diff = self.prev_ca_rmsd - curr_ca_rmsd
           if diff < 0:
              reward = diff
-          elif diff > 0 and curr_ca_rmsd <= 6:
-             reward = 1 / (1 + curr_ca_rmsd)
           else:
              reward = 0
           
         #print(reward)
         self.prev_ca_rmsd = curr_ca_rmsd
+
+        self.prev_energy = self.curr_energy
           
         return self.get_distance_map(),reward, done
         
@@ -275,10 +299,52 @@ class DQNAgent:
 
 
 
-env = env('/home/esdft/Desktop/3HE4A_3HE4B.pdb', '/home/esdft/Desktop/3HE4_AB.pdb')
+env = env('/home/esdft/Desktop/3HE4A_3HE4B.pdb', '/home/esdft/Desktop/3HE4_AB.pdb', '/home/esdft/DeepRLP/data/3HE4A_3HE4B.rr', '/home/esdft/DeepRLP/data/talaris2013.wts')
 dist_map = env.get_distance_map()
 state_dim = dist_map.shape
 n_actions = env.n_actions
+
+
+
+'''print(state_dim)
+print(n_actions)
+
+env.atom_restraints.apply(env.pose)
+print(env.scorefxn(env.pose))
+env.pose.remove_constraints()
+#env.pose.remove_constraints()
+#print(env.scorefxn.show(env.original_pose))
+
+print(env.prev_energy)
+
+for itr in range(1):
+    env.step(3)
+    
+
+print(env.curr_energy)
+
+env.atom_restraints.apply(env.pose)
+#add_cons_to_pose(env.pose, '/home/esdft/DeepRLP/data/3HE4A_3HE4B.rr')
+print(env.scorefxn(env.pose))
+env.pose.remove_constraints()
+
+#scorefxn = ScoreFunction()
+#scorefxn.add_weights_from_file('/home/esdft/DeepRLP/data/talaris2013.wts')
+#scorefxn.set_weight(atom_pair_constraint, 1)
+
+
+
+
+
+for itr in range(1):
+    env.step(9)
+
+print(env.curr_energy)
+
+env.atom_restraints.apply(env.pose)
+print(env.scorefxn(env.pose))
+env.pose.remove_constraints()'''
+#env.pose.dump_pdb('/home/esdft/DeepRLP/data/3HE4_rotated1.pdb')
 
 '''print(dist_map)
 print(state_dim)
@@ -286,7 +352,7 @@ print(type(state_dim))
 print(n_actions)
 
 
-print(env.step(8))
+
 
 print(env.pose.residue(1).atom('CB').xyz())
 print(env.pose.residue(2).atom('CB').xyz())
@@ -314,6 +380,14 @@ print(env.prev_ca_rmsd)
 
 print(env.get_current_state())'''
 
+
+
+
+
+
+
+
+
 agent = DQNAgent("dqn_agent", state_dim, n_actions, epsilon=0.5)
 sess.run(tf.global_variables_initializer())
 
@@ -330,6 +404,7 @@ def evaluate(env, agent, n_games=3, greedy=False, t_max=10000):
             qvalues = agent.get_qvalues([s])
             action = qvalues.argmax(axis=-1)[0] if greedy else agent.sample_actions(qvalues)[0]
             s, r, done = env.step(action)
+            
             #print(action, r, done)
             reward += r
             if done: break
@@ -343,11 +418,12 @@ def evaluate(env, agent, n_games=3, greedy=False, t_max=10000):
       f.write('\n')
     print(mean_reward)
     print(env.prev_ca_rmsd)
+    print(env.curr_energy)
     return mean_reward
 
 
  
-#evaluate(env, agent, n_games=3)
+#evaluate(env, agent, n_games=20)
 #print(env.prev_ca_rmsd)
 
 def play_and_record(agent, env, exp_replay, initial_state, n_steps=1):

@@ -160,7 +160,8 @@ class env():
           if diff < 0:
              reward = diff
           elif diff > 0 and curr_ca_rmsd <= 6:
-             reward = 1 / (1 + curr_ca_rmsd)
+             #reward = 1 / (1 + curr_ca_rmsd)
+             reward = diff
           else:
              reward = 0
           

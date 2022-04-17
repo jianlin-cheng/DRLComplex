@@ -31,9 +31,12 @@ git clone git@github.com:jianlin-cheng/DeepRLP.git
 
 cd DeepRLP
 pip install -r requirements.txt
-``` 
+
 
 Alternatively, environment.yml files are provided to install the required packages using pip or conda.
+``` 
+
+
 
 
 

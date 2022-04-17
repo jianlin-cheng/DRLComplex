@@ -24,7 +24,8 @@ The package is tested using Python 3.6 and 3.7. To install the software, please 
 * Install the package following the instruction below:
 
 
-```git clone git@github.com:jianlin-cheng/DeepRLP.git
+```
+git clone git@github.com:jianlin-cheng/DeepRLP.git
 
 (If fail, try username) git clone https://github.com/jianlin-cheng/DeepRLP.git
 

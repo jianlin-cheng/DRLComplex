@@ -47,7 +47,13 @@ python ./scripts/true_structure/dqn_docking_reward9.py <initial_pdb> <native_str
 
 ```
 
+2. Reconstructing the dimer structure using true/predicted contacts
 
+```
+
+python ./scripts/predicted_contacts/dqn_docking.py <path_to_the_DeepRLP_tool> <initial_start> <res_file> <out_dir> <target_name>
+
+```
 
 
 

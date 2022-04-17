@@ -37,6 +37,16 @@ Alternatively, environment.yml files are provided to install the required packag
 ``` 
 
 
+# Basic Usage
+
+1. Reconstructing the dimer structure using true structure
+
+```
+
+python ./scripts/true_structure/dqn_docking_reward9.py <initial_pdb> <native_strcuture>
+
+```
+
 
 
 

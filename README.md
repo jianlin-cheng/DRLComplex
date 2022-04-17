@@ -13,6 +13,7 @@
 * setuptools>=44.0.0
 * imageio>=2.10.1
 * matplotlib>=3.4.2
+* tensorflow==1.15
 
 
 # Installation
@@ -55,7 +56,7 @@ python ./scripts/predicted_contacts/dqn_docking.py <path_to_the_DeepRLP_tool> <i
 
 ```
 
-
+#####
 
 A video demonstrating how DRLComplex reconstructs the dimer structure using true interchain contacts:
 

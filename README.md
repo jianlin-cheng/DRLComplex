@@ -56,9 +56,9 @@ python ./scripts/predicted_contacts/dqn_docking.py <path_to_the_DeepRLP_tool> <i
 
 ```
 
-##########
 
-A video demonstrating how DRLComplex reconstructs the dimer structure using true interchain contacts:
+
+##########A video demonstrating how DRLComplex reconstructs the dimer structure using true interchain contacts:
 
 
 https://user-images.githubusercontent.com/45056120/163706448-ad3cb499-d9ec-423f-a36a-6d5932946f42.mp4

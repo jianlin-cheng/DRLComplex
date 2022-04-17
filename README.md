@@ -43,7 +43,7 @@ Alternatively, environment.yml files are provided to install the required packag
 
 ```
 
-python ./scripts/true_structure/dqn_docking_reward9.py <initial_pdb> <native_strcuture>
+python ./scripts/true_structure/dqn_docking.py <initial_pdb> <native_strcuture>
 
 ```
 

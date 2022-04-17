@@ -36,6 +36,10 @@ Alternatively, environment.yml files are provided to install the required packag
 
 
 
+
+A video demonstrating how DRLComplex reconstructs the dimer structure using true interchain contacts:
+
+
 https://user-images.githubusercontent.com/45056120/163706448-ad3cb499-d9ec-423f-a36a-6d5932946f42.mp4
 
 
